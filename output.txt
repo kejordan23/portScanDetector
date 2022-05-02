@@ -1,0 +1,172 @@
+/Users/kyliejordan/Desktop/CS5349/portscanner/cmake-build-debug/portscanner /Users/kyliejordan/Desktop/CS5349/portscanner/test.pcap
+Hello, World!
+src port: 0 dest port: 0
+src address: 192.168.1.4 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 1
+Packet size: 214 bytes
+Epoch Time: 1650244850:182101 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.27 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 2
+Packet size: 82 bytes
+Epoch Time: 1650244850:182103 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.29 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 3
+Packet size: 214 bytes
+Epoch Time: 1650244850:182234 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.13 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 4
+Packet size: 214 bytes
+Epoch Time: 1650244850:182811 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.21 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 5
+Packet size: 214 bytes
+Epoch Time: 1650244850:183141 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.25 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 6
+Packet size: 214 bytes
+Epoch Time: 1650244850:183531 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.31 dest address: 255.255.255.255
+seq number: 0 ack number: 0
+Packet # 7
+Packet size: 214 bytes
+Epoch Time: 1650244850:591877 seconds
+
+
+src port: 0 dest port: 0
+src address: 52.96.57.82 dest address: 192.168.1.36
+seq number: 0 ack number: 0
+Packet # 8
+Packet size: 101 bytes
+Epoch Time: 1650244850:593441 seconds
+
+
+src port: 0 dest port: 0
+src address: 192.168.1.36 dest address: 52.96.57.82
+seq number: 0 ack number: 0
+Packet # 9
+Packet size: 66 bytes
+Epoch Time: 1650244850:593509 seconds
+
+
+src port: 0 dest port: 0
+src address: 52.96.57.82 dest address: 192.168.1.36
+seq number: 0 ack number: 0
+Packet # 10
+Packet size: 1157 bytes
+Epoch Time: 1650244850:596095 seconds
+
+
+src port: 17029 dest port: 62605
+src address: 52.96.57.82 dest address: 192.168.1.36
+seq number: 735991974 ack number: 4029944321
+Packet # 11
+Packet size: 101 bytes
+Epoch Time: 1650244850:596097 seconds
+
+
+src port: 35180 dest port: 24872
+src address: 192.168.1.36 dest address: 52.96.57.82
+seq number: 212932783 ack number: 2205216407
+Packet # 12
+Packet size: 66 bytes
+Epoch Time: 1650244850:596161 seconds
+
+
+src port: 2382 dest port: 35979
+src address: 192.168.1.14 dest address: 255.255.255.255
+seq number: 1387101659 ack number: 1641631179
+Packet # 13
+Packet size: 214 bytes
+Epoch Time: 1650244851:1404 seconds
+
+
+src port: 2382 dest port: 35979
+src address: 192.168.1.17 dest address: 255.255.255.255
+seq number: 1387101659 ack number: 1641631179
+Packet # 14
+Packet size: 214 bytes
+Epoch Time: 1650244851:1406 seconds
+
+
+src port: 40082 dest port: 25658
+src address: 192.168.1.36 dest address: 192.168.1.27
+seq number: 4195296195 ack number: 3294855901
+Packet # 15
+Packet size: 176 bytes
+Epoch Time: 1650244851:6596 seconds
+
+
+src port: 40082 dest port: 25658
+src address: 192.168.1.27 dest address: 192.168.1.36
+seq number: 4195296195 ack number: 3294855901
+Packet # 16
+Packet size: 176 bytes
+Epoch Time: 1650244851:18493 seconds
+
+
+src port: 35180 dest port: 24872
+src address: 192.168.1.36 dest address: 192.168.1.27
+seq number: 212932783 ack number: 2205216407
+Packet # 17
+Packet size: 66 bytes
+Epoch Time: 1650244851:18564 seconds
+
+
+src port: 40082 dest port: 25658
+src address: 192.168.1.36 dest address: 192.168.1.24
+seq number: 4195296195 ack number: 3294855901
+Packet # 18
+Packet size: 176 bytes
+Epoch Time: 1650244851:104935 seconds
+
+
+src port: 40082 dest port: 25658
+src address: 192.168.1.36 dest address: 192.168.1.10
+seq number: 4195296195 ack number: 3294855901
+Packet # 19
+Packet size: 176 bytes
+Epoch Time: 1650244851:116727 seconds
+
+
+src port: 40082 dest port: 25658
+src address: 192.168.1.24 dest address: 192.168.1.36
+seq number: 4195296195 ack number: 3294855901
+Packet # 20
+Packet size: 176 bytes
+Epoch Time: 1650244851:125839 seconds
+
+
+src port: 35180 dest port: 24872
+src address: 192.168.1.36 dest address: 192.168.1.24
+seq number: 212932783 ack number: 2205216407
+Packet # 21
+Packet size: 66 bytes
+Epoch Time: 1650244851:125875 seconds
+
+
+
+Process finished with exit code 0
