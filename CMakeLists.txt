@@ -5,5 +5,5 @@ set(CMAKE_CXX_STANDARD 14)
 
 include(FindPCAP.cmake)
 
-add_executable(portscanner main.cpp Parse.h)
+add_executable(portscanner main.cpp Parse.h Packet.h)
 target_link_libraries(portscanner ${PCAP_LIBRARY})

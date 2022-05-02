@@ -7,5 +7,6 @@ int main(int argc, char **argv) {
     //input absolute path to file here
     string t = argv[1];
     p.doParse(t);
+    p.detScan();
     return 0;
 }

@@ -9,9 +9,11 @@
 #ifndef PORTDET_PARSE_H
 #define PORTDET_PARSE_H
 
-#include <iostream>
+
 #include <iostream>
 #include <pcap.h>
+#include "Packet.h"
+#include <vector>
 
 using namespace std;
 
@@ -42,6 +44,8 @@ struct sniff_tcp {
 };
 
 class Parse{
+private:
+    vector<Packet> packets;
 public:
     Parse(){};
     void doParse(string& file){
@@ -61,28 +65,129 @@ public:
             ip = (struct sniff_ip*)(data + SIZE_ETHERNET);
             tcp = (struct sniff_tcp*)(data + SIZE_ETHERNET + header->len * 4);
 
-            u_short srcport = ntohs(tcp->th_sport);
-            u_short dstport = ntohs(tcp->th_dport);
-            printf("src port: %d dest port: %d \n", srcport, dstport);
+            int srcport = ntohs(tcp->th_sport);
+            int dstport = ntohs(tcp->th_dport);
+            //printf("src port: %d dest port: %d \n", srcport, dstport);
 
+            string protocol;
             char srcname[100];
             strcpy(srcname, inet_ntoa(ip->ip_src));
             char dstname[100];
             strcpy(dstname, inet_ntoa(ip->ip_dst));
-            printf("src address: %s dest address: %s \n", srcname, dstname);
+            //printf("src address: %s dest address: %s \n", srcname, dstname);
+            string temp = dstname;
+
+            if(temp == "255.255.255.255")
+                protocol = "UDP";
+            else
+                protocol = "TCP";
+            //cout<<"protocol: "<<protocol<<endl;
 
             u_long seq = ntohl(tcp->th_seq);
             u_long ack = ntohl(tcp->th_ack);
-            printf("seq number: %u ack number: %u \n", seq, ack);
-            printf("Packet # %i\n", ++packetCount);
-            printf("Packet size: %d bytes\n", header->len);
+            //printf("seq number: %u ack number: %u \n", seq, ack);
+            ++packetCount;
+            //printf("Packet # %i\n", ++packetCount);
+            //printf("Packet size: %d bytes\n", header->len);
 
             if (header->len != header->caplen)
                 printf("Warning! Capture size different than packet size: %ld bytes\n", header->len);
 
-            printf("Epoch Time: %d:%d seconds\n", header->ts.tv_sec, header->ts.tv_usec);
+            Packet p(srcport, dstport, srcname, dstname, protocol, seq, ack, header->len, packetCount);
+            packets.push_back(p);
 
-            printf("\n\n");
+            //printf("Epoch Time: %d:%d seconds\n", header->ts.tv_sec, header->ts.tv_usec);
+
+        }
+    };
+    void detScan(){
+        detPingScan();
+        detTCPSYNScan();
+
+    };
+
+    void detUDPScan(){
+
+    };
+
+    void detTCPSYNScan(){
+        vector<int> scanIps;
+        string prevSrc;
+        string prevDst;
+        int synCnt = 0;
+        int prevsynCnt = 0;
+        for(int i = 0; i< packets.size(); i++){
+            if((packets[i].getSrcIp() == prevDst) && (packets[i].getDstIp() == prevSrc) && packets[i].getProtocol() == "TCP"){
+                synCnt++;
+            }
+            else if(synCnt < 1 && (packets[i].getSrcIp() != prevDst) && (packets[i].getDstIp() != prevSrc) && packets[i-1].getProtocol() == "TCP"){
+                scanIps.push_back(i-1);
+                synCnt = 0;
+            }
+            else if(synCnt < 2 && (packets[i].getSrcIp() != prevDst) && (packets[i].getDstIp() != prevSrc) && packets[i-1].getProtocol() == "TCP"){
+                scanIps.push_back(i-2);
+                synCnt = 0;
+            }
+            if(synCnt >=2)
+                synCnt = 0;
+            prevSrc = packets[i].getSrcIp();
+            prevDst = packets[i].getDstIp();
+        }
+        if(scanIps.size() > 0){
+            cout<<"TCP/SYN Scan detected!!"<<endl;
+            for(int i = 0; i< scanIps.size(); i++) {
+                cout << "SrcIp: "<<packets[scanIps[i]].getSrcIp()<<endl;
+                cout << "DstIp: "<<packets[scanIps[i]].getDstIp()<<endl;
+            }
+            cout<<endl;
+        }
+    };
+
+    void detTCPConnectScan(){
+
+    };
+
+    void detPingScan(){
+        vector<int> pingIps;
+        vector<int> numPack;
+        string prevSrc;
+        string prevDst;
+        int pingCnt = 0;
+        int prevCnt = 0;
+        int ran1 = 100;
+        int ran2 = 0;
+        for(int i = 0; i< packets.size(); i++){
+            if((packets[i].getSrcIp() == prevSrc) && (packets[i].getDstIp() == prevDst && packets[i].getProtocol() == "TCP")){
+                pingCnt++;
+                prevCnt = pingCnt;
+                if(ran1 > i)
+                    ran1 = i-1;
+            }
+            else if(prevCnt > 2 && pingCnt == 0) {
+                pingIps.push_back(ran1);
+                numPack.push_back(prevCnt);
+                prevCnt = 0;
+            }
+            else {
+                pingCnt = 0;
+                ran1 = 100;
+            }
+            prevSrc = packets[i].getSrcIp();
+            prevDst = packets[i].getDstIp();
+        }
+        if(pingIps.size() > 0){
+            cout<<"Ping Scan detected!!"<<endl;
+            for(int i = 0; i< pingIps.size(); i++) {
+                cout << "SrcIp: "<<packets[pingIps[i]].getSrcIp();
+                cout<< " Num Ips Scanned: "<<numPack[i]<<endl;
+            }
+            cout<<endl;
+        }
+    };
+
+    void print(){
+        for(int i = 0; i< packets.size(); i++){
+            packets[i].print();
         }
     };
 };
