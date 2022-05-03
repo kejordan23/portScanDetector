@@ -1,7 +1,7 @@
 /*
  * Author: Kylie Jordan
  *
- * PCAP code modified from: https://stackoverflow.com/questions/21222369/getting-ip-address-of-a-packet-in-pcap-file
+ * PCAP parsing code modified from: https://stackoverflow.com/questions/21222369/getting-ip-address-of-a-packet-in-pcap-file
  *
  * This is a basic parsing scheme for a pcap file
  */
@@ -46,6 +46,7 @@ struct sniff_tcp {
 class Parse{
 private:
     vector<Packet> packets;
+    vector<Packet> connectIps;
 public:
     Parse(){};
     void doParse(string& file){
@@ -100,16 +101,52 @@ public:
 
         }
     };
+
+    //function calls all scan detections available
+    // Ping, TCP Connect, TCP/SYN, UDP
     void detScan(){
         detPingScan();
+        detTCPConnectScan();
         detTCPSYNScan();
-
+        detUDPScan();
     };
 
+    // detects UDP scan when a srcIp scans a large # of ports on the dstIp
     void detUDPScan(){
-
+        vector<int> scanIps;
+        string prevSrc;
+        string prevDst;
+        int ports = 0;
+        bool taken = false;
+        for(int i = 0; i< packets.size(); i++) {
+            if ((packets[i].getSrcIp() == prevSrc) && (packets[i].getDstIp() == prevDst) && packets[i].getProtocol() == "UDP") {
+                if(packets[i].getDstIp() != "255.255.255.255")
+                    ports++;
+            }
+            else{
+                ports = 0;
+                taken = false;
+            }
+            if(ports > 5 && !taken) {
+                scanIps.push_back(i);
+                taken = true;
+            }
+            prevSrc = packets[i].getSrcIp();
+            prevDst = packets[i].getDstIp();
+        }
+        if(scanIps.size() > 0){
+            cout<<"UDP Scan detected!!"<<endl;
+            for(int i = 0; i< scanIps.size(); i++) {
+                cout << "SrcIp: "<<packets[scanIps[i]].getSrcIp()<<endl;
+                cout << "DstIp: "<<packets[scanIps[i]].getDstIp()<<endl;
+            }
+            cout<<endl;
+        }
     };
 
+    // detects scan when there is an incomplete TCP handshake
+    // SYN with nop response
+    // SYN | SYN-ACK | no RST
     void detTCPSYNScan(){
         vector<int> scanIps;
         string prevSrc;
@@ -133,8 +170,49 @@ public:
             prevSrc = packets[i].getSrcIp();
             prevDst = packets[i].getDstIp();
         }
+        vector<int> valid;
         if(scanIps.size() > 0){
+            for(int i = 0; i< scanIps.size(); i++) {
+                for(int j = 0; j<connectIps.size(); j++){
+                    if(packets[scanIps[i]].getSrcIp() != connectIps[j].getSrcIp() || packets[scanIps[i]].getDstIp() != connectIps[j].getDstIp())
+                        valid.push_back(scanIps[i]);
+                }
+            }
             cout<<"TCP/SYN Scan detected!!"<<endl;
+            for(int i = 0; i< valid.size(); i++) {
+                cout << "SrcIp: "<<packets[valid[i]].getSrcIp()<<endl;
+                cout << "DstIp: "<<packets[valid[i]].getDstIp()<<endl;
+            }
+            cout<<endl;
+        }
+    };
+
+    // detects scan when a full TCP handshake is completed but no data packets are sent afterwards
+    // SYN | SYN-ACK | RST
+    void detTCPConnectScan(){
+        vector<int> scanIps;
+        string prevSrc;
+        string prevDst;
+        int synCnt = 0;
+        int prevsynCnt = 0;
+        for(int i = 0; i< packets.size(); i++) {
+            if ((packets[i].getSrcIp() == prevDst) && (packets[i].getDstIp() == prevSrc) && packets[i].getProtocol() == "TCP") {
+                if(packets[i].getSize() < 200)
+                    synCnt++;
+            }
+            else
+                synCnt = 0;
+            if(synCnt == 2) {
+                scanIps.push_back(i - 2);
+                connectIps.push_back(packets[i-2]);
+            }
+
+            prevSrc = packets[i].getSrcIp();
+            prevDst = packets[i].getDstIp();
+        }
+
+        if(scanIps.size() > 0){
+            cout<<"TCP Connect Scan detected!!"<<endl;
             for(int i = 0; i< scanIps.size(); i++) {
                 cout << "SrcIp: "<<packets[scanIps[i]].getSrcIp()<<endl;
                 cout << "DstIp: "<<packets[scanIps[i]].getDstIp()<<endl;
@@ -143,10 +221,7 @@ public:
         }
     };
 
-    void detTCPConnectScan(){
-
-    };
-
+    // detects scan when same srcIp sends TCP SYN packets to same dstIp multiple times
     void detPingScan(){
         vector<int> pingIps;
         vector<int> numPack;
@@ -155,7 +230,6 @@ public:
         int pingCnt = 0;
         int prevCnt = 0;
         int ran1 = 100;
-        int ran2 = 0;
         for(int i = 0; i< packets.size(); i++){
             if((packets[i].getSrcIp() == prevSrc) && (packets[i].getDstIp() == prevDst && packets[i].getProtocol() == "TCP")){
                 pingCnt++;
